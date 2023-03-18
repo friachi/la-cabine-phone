@@ -28,7 +28,7 @@
 
 // ===== Define Software ===== //
 #define PLAYLISTMAXSIZE   100
-#define RECODINGSMAXSIZE  250
+#define RECODINGSMAXSIZE  1000
 #define ADDR_EEPROM_MARKER 0  // EEPROM marker address
 #define MARKER_EEPROM 123     // EEPROM marker value
 
@@ -63,6 +63,7 @@ int stallPeriod = 15000;
 boolean playing = false;
 time_t timeNow;
 int autoRestartHour = 3;
+int motion; 
 
 //Recording vars
 String recordingslist[RECODINGSMAXSIZE];
@@ -239,7 +240,8 @@ void setup() {
     
   
   Serial.println(F("====================== RUN ======================"));
-  
+
+    
   if (digitalRead(SWM) == HIGH){
     Serial.println("Admin idle");
     state = AdminIdle;
@@ -269,9 +271,9 @@ void loop(void) {
   numberSwitch.update();
   modeSwitch.update();
   internalSwitch.update();
-  int motion = digitalRead(MOT);
-
+  motion = digitalRead(MOT);
   
+
     
   switch(state){
     case Stalling: 
@@ -289,7 +291,7 @@ void loop(void) {
           delay(stallPeriod);
         }
         state = Idle;
-        Serial.println("Idle");     
+        Serial.println("Idle after stall");     
         
         break; // from Stalling
     }
@@ -399,7 +401,7 @@ void loop(void) {
     {
       digitalWrite(GLED, LOW);
       digitalWrite(RLED, HIGH);
-      float vol = analogRead(15);
+      float vol = analogRead(VOL);
       vol = vol / 1024;
       audioBoard.volume(vol);
 
@@ -705,6 +707,10 @@ void loop(void) {
         numberPulseCount++;
       }
 
+      float vol = analogRead(VOL);
+      vol = vol / 1024;
+      audioBoard.volume(vol);
+
       if(dialSwitch.rose()){
         if (selectedListSize > 0){
 
@@ -768,7 +774,7 @@ void loop(void) {
   
   } // end switch
     
-  if(hookSwitch.rose() && digitalRead(SWM) == LOW){
+  if(hookSwitch.rose() && digitalRead(SWM) == LOW && state != Idle){
     Serial.println("Hook down");
     if (state == Recording)
       stopRecording();
@@ -788,12 +794,12 @@ void loop(void) {
   
   }
 
-  if (modeSwitch.rose()){
-    Serial.println("Admin Idle mode");
-    if (state == Recording)
-      stopRecording();
-    state = AdminIdle;  
-  }
+  //if (modeSwitch.rose()){
+  //  Serial.println("Admin Idle mode");
+  //  if (state == Recording)
+  //    stopRecording();
+  //  state = AdminIdle;  
+  //}
 
 }
 
