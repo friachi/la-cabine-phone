@@ -444,7 +444,17 @@ void loop(void) {
       digitalWrite(RLED, HIGH);
       unsigned long currentMillis = millis();
       continueRecording();
-      if (currentMillis - previousRecMillis >= recInterval) {
+      unsigned long diff = currentMillis - previousRecMillis;
+
+      // 10 seconds before end of recording, start flashing the green led
+      if (diff >= (recInterval-10000)) {
+        if( (diff/1000 % 2) == 0) {
+          digitalWrite(GLED, !digitalRead(GLED));
+        }
+      }
+
+      // stop recording when recInterval has passed
+      if (diff >= recInterval) {
         stopRecording();
         playMessage("MSG_LEAVE.wav");
         state = EndPrompt;
