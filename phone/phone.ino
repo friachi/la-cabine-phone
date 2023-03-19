@@ -1,3 +1,10 @@
+/*
+ * Author: Fahd Al Riachi - 2023, email: riachi@gmail.com
+ * LA CABINE 134 - Telephone installation
+ * This code operates an old rotary phone allownig playback and recording 
+ * In addition, it allows customizing and tweeking various phone settings
+ */
+
 
 #include <Audio.h>
 #include <Wire.h>

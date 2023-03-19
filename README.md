@@ -1,42 +1,19 @@
 ﻿# LA CABINE **134** 
 
-
-
+***Support* *contact***: Fahed Al Riachi, <riachi@gmail.com>
 
 # Intro
 
-This manual addresses the usage, configuration and troubleshooting of the “Phone” that is specifically designed for “LA CABINE 134” Installation. 
+This manual addresses the usage, configuration and troubleshooting of the “Phone” that is specifically designed for “LA CABINE 134” Installation. (.pdf and .docx version available in [./resources](resources) folder)
 
 It is aimed at people with some technical knowledge in order to help facilitating the maintenance of the installation and make sure that the phone is always running correctly, and in case of issues, to have enough info to troubleshoot and/or reach for help 
 
-***Support* *contact***: Fahed Al Riachi, <riachi@gmail.com>
 
 **What is the expected behavior of the phone when it is operating normally?**
 
 When the phone is in “*Normal Operation*”, it is supposed to ring when a user is in its close vicinity. If the user lifts the phone, the phone will play a pre-recorded interview. When this playback is done, the user is prompted in case he/she wants to record a message. When done, the user can put down the hook/hangup. 
 
 That’s it, when the hook is down, the phone will wait for a while before it starts detecting and taking on new users.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 # Normal Operation
@@ -137,4 +114,18 @@ To listen to these files on the phones directly, check section: Admin menu  > *A
 - Files and folders names are Case Sensitive.
 - *history.log file will keep track of important events for later inspection: Phone restart, SD card space limit reached, Interview is playing or abandoned, Recording is being made or stopped, a setting has been modified, and Error messages if any*
 
+
+# Design
+
+# Hardware
+
+![High level schematic](resources/hl_schematic.png)
+
+![Circuit](resources/circuit_3d.png)
+
+# Software
+
+Code is [here](phone/phone.ino) running on Teensy 4.1 with Teensy Audio board 4.x rev D
+
+![State machine flow diagram](resources/code_flow_state_machine.png)
 
