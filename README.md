@@ -4,7 +4,7 @@
 
 # Intro
 
-This manual addresses the usage, configuration and troubleshooting of the “Phone” that is specifically designed for “LA CABINE 134” Installation. (.pdf and .docx version available in [./resources](resources) folder)
+This manual addresses the usage, configuration and troubleshooting of the “Phone” that is specifically designed for “LA CABINE 134” Installation. A [pdf](resources/Phone%20manual.pdf) and [docx](resources/Phone%20manual.pdf) versions are available in [resources](resources) folder
 
 It is aimed at people with some technical knowledge in order to help facilitating the maintenance of the installation and make sure that the phone is always running correctly, and in case of issues, to have enough info to troubleshoot and/or reach for help 
 
@@ -114,6 +114,38 @@ To listen to these files on the phones directly, check section: Admin menu  > *A
 - The SD card should be formatted FAT32, max size 64GB
 - Files and folders names are Case Sensitive.
 - *history.log file will keep track of important events for later inspection: Phone restart, SD card space limit reached, Interview is playing or abandoned, Recording is being made or stopped, a setting has been modified, and Error messages if any*
+
+
+# Debug
+
+All interactions and errors (if any) are logged to Serial port (very verbose)  
+
+Additionally, significant events are logged to SD card for usage analysis, also for easing support. log file is **history.log**  
+Log line format: _[DATETIME ISO],[CITY],[EVENT],[MESSAGE]_
+
+
+```bash
+2023-03-20 9:18:03,/PortVendres,Restarted,SD & RTC OK
+2023-03-20 9:18:03,/PortVendres,Playlist size,3 / 100
+2023-03-20 9:18:03,/PortVendres,Recordings list size,11 / 1000
+2023-03-20 9:18:14,/PortVendres,Restarted,SD & RTC OK
+2023-03-20 9:18:14,/PortVendres,Settings,stallPeriod: 5000; recInterval: 120000; recEnabled: 1; ringerEnabled: 1; interviewsSelected: 0; cityIndex: 0; prePlayPrompt: 1; autoRestart: 1
+2023-03-20 9:18:14,/PortVendres,Playlist size,3 / 100
+2023-03-20 9:18:14,/PortVendres,Recordings list size,11 / 1000
+2023-03-20 9:18:45,/PortVendres,Ringing abandoned,After 7 rings
+2023-03-20 9:18:59,/PortVendres,Playing,INT_TRIOS.wav
+2023-03-20 9:19:19,/PortVendres,Playing abandoned,Interview 'INT_TRIOS.wav' abandoned at 73.53% (@ 19.65/26.72 seconds)
+2023-03-20 9:19:37,/PortVendres,Playing,INT_TRIOS.wav
+2023-03-20 9:20:04,/PortVendres,Playing ended,Duration(sec): 26.72
+2023-03-20 9:20:12,/PortVendres,Recording,12.wav
+2023-03-20 9:20:23,/PortVendres,Recording stopped,- Recording stopped (duration: 10.00 sec)
+2023-03-20 9:20:40,/PortVendres,Admin,  - Admin playlist has changed to: 0 (1: Interviews, 0: Recordings)
+2023-03-20 9:20:43,/PortVendres,Admin,  - Admin playlist has changed to: 1 (1: Interviews, 0: Recordings)
+2023-03-20 9:21:01,/PortVendres,Admin,  - Admin playlist has changed to: 0 (1: Interviews, 0: Recordings)
+2023-03-20 9:22:01,/PortVendres,Admin,  - Stall period changed to: 20000
+2023-03-20 9:22:10,/PortVendres,Admin,  - Stall period changed to: 5000
+...
+```
 
 
 # Design

@@ -38,6 +38,7 @@
 #define RECODINGSMAXSIZE  1000
 #define ADDR_EEPROM_MARKER 0  // EEPROM marker address
 #define MARKER_EEPROM 123     // EEPROM marker value
+#define MAX_RINGS 7     // EEPROM marker value
 
 #define RESTART_ADDR       0xE000ED0C
 #define READ_RESTART()     (*(volatile uint32_t *)RESTART_ADDR)
@@ -55,7 +56,7 @@ int playlistSize = 0;
 int playNextIndex = 0;
 String currentInterview = "";
 unsigned long lastRingTime;
-int ringsBeforeAbandon = 7;
+int ringsBeforeAbandon = MAX_RINGS;
 unsigned long previousFlashMillis = 0;
 const long flashInterval = 500;
 int numberPulseCount = 0;
@@ -71,6 +72,7 @@ boolean playing = false;
 time_t timeNow;
 int autoRestartHour = 3;
 int motion; 
+float dura = 0;
 
 //Recording vars
 String recordingslist[RECODINGSMAXSIZE];
@@ -202,6 +204,8 @@ void setup() {
   checkSd();
 
   log("Restarted","SD & RTC OK");
+
+  logSettings();
   
   Serial.println(F("================= LOAD PLAYLIST ================="));
 
@@ -309,7 +313,7 @@ void loop(void) {
       playWav1.stop();
       digitalWrite(GLED, HIGH);
       digitalWrite(RLED, LOW);
-      ringsBeforeAbandon = 5;
+      ringsBeforeAbandon = MAX_RINGS;
       
       if(hookSwitch.fell()){
         Serial.println("Hook up");
@@ -380,9 +384,10 @@ void loop(void) {
       }
 
       if (ringsBeforeAbandon == 0) {
+        log("Ringing abandoned","After " + String(MAX_RINGS) + " rings");
         Serial.println("Abandon Ringing and return to Idle");
         Serial.println("Idle");
-        ringsBeforeAbandon = 5;
+        ringsBeforeAbandon = MAX_RINGS;
         state = Idle;
       }
        
@@ -411,11 +416,19 @@ void loop(void) {
       float vol = analogRead(VOL);
       vol = vol / 1024;
       audioBoard.volume(vol);
-
-      if(!playWav1.isPlaying()){
+       
+      if (playWav1.isPlaying())
+      {
+         dura = playWav1.lengthMillis();
+      }
+      else{
+        // ended
         Serial.println("Checking if recording is possible...");
         digitalWrite(GLED, LOW);
         digitalWrite(RLED, LOW);
+        
+        String msg = "Duration(sec): " + String(dura/1000);
+        log("Playing ended", msg);
         
         if(canRecord()){
           playMessage("MSG_PREREC.wav");
@@ -822,6 +835,15 @@ void loop(void) {
 
 
 //==================================================== Utility functions =================================================== //
+
+void logSettings(){
+
+String msg = "stallPeriod: " + String(stallPeriod) + "; recInterval: " + String(recInterval) + "; recEnabled: " + String(recEnabled) + "; ringerEnabled: " + String(ringerEnabled) + "; interviewsSelected: " + String(interviewsSelected) + "; cityIndex: " + String(cityIndex) + "; prePlayPrompt: " + String(prePlayPrompt) + "; autoRestart: " + String(autoRestart);
+
+log("Settings", msg);
+
+}
+
 
 void restart(){
   Serial.println("Restarting in 3 seconds...");
