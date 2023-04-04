@@ -5,6 +5,10 @@
  * In addition, it allows customizing and tweeking various phone settings
  */
 
+ //updates: Adapted in portvendre to:
+ // add preRingInterval, default at 30 secs, with saving mechanism using command 8
+ // extend stallPeriod to have 1 min included
+
 
 #include <Audio.h>
 #include <Wire.h>
@@ -59,6 +63,8 @@ unsigned long lastRingTime;
 int ringsBeforeAbandon = MAX_RINGS;
 unsigned long previousFlashMillis = 0;
 const long flashInterval = 500;
+unsigned int preRingInterval = 5000;
+unsigned long motionDetectedTime = 0;
 int numberPulseCount = 0;
 boolean recEnabled = true;
 boolean ringerEnabled = true;
@@ -67,7 +73,7 @@ boolean prePlayPrompt = true;
 boolean autoRestart = true;
 String *selectedList = playlist;
 int selectedListSize = 0;
-int stallPeriod = 15000;
+unsigned int stallPeriod = 15000;
 boolean playing = false;
 time_t timeNow;
 int autoRestartHour = 3;
@@ -121,7 +127,7 @@ AudioConnection          patchCord4(audioInput, 0, queue1, 0);
 
 
 const int bounceTime = 6;
-typedef enum {Stalling, Idle, Ringing, PrePlay, Playing, RecPrompt, Recording, EndPrompt, Wait, AdminIdle, Command, PlayNext} stateType;
+typedef enum {Stalling, Idle, PreRinging, Ringing, PrePlay, Playing, RecPrompt, Recording, EndPrompt, Wait, AdminIdle, Command, PlayNext} stateType;
 stateType state = Idle;
 
 Bounce hookSwitch = Bounce();
@@ -327,7 +333,11 @@ void loop(void) {
 
       if(motion == HIGH && ringerEnabled) {
         Serial.println("Motion detected");
-        state = Ringing;
+        Serial.print("Delay ringing by ");
+        Serial.print(preRingInterval/1000);
+        Serial.println(" (seconds)");
+        motionDetectedTime = millis();
+        state = PreRinging;
       }
 
       if(autoRestart) {
@@ -342,6 +352,27 @@ void loop(void) {
       
      
       break; // from Idle
+    }
+
+    case PreRinging:
+    {
+      unsigned long now = millis();
+      digitalWrite(RLED, HIGH);
+      if (now - motionDetectedTime >= preRingInterval){
+        digitalWrite(RLED, LOW);
+        state = Ringing;       
+      }
+
+      if(hookSwitch.fell()){
+        Serial.println("Hook lifted during pre-Ring delay");
+        state = PrePlay;
+        delay(1500);
+        if (prePlayPrompt){
+          playMessage("MSG_PREPLAY.wav");
+        }
+      }
+       
+      break;
     }
 
     case Ringing:
@@ -628,13 +659,18 @@ void loop(void) {
           stallPeriod = 15000;
         else if(stallPeriod == 15000)
           stallPeriod = 20000;
+        else if(stallPeriod == 20000)
+          stallPeriod = 30000;
+        else if(stallPeriod == 30000)
+          stallPeriod = 60000;
+        
         else
           stallPeriod = 5000;
 
-        String msg = "  - Stall period changed to: " + String(stallPeriod);
+        String msg = "  - Stall period changed to: " + String(stallPeriod/1000) + " seconds";
         Serial.println(msg);
         log("Admin",msg);
-        if (stallPeriod == 15000) // i.e if equal default
+        if (stallPeriod == 60000) // i.e if equal default
           digitalWrite(GLED, HIGH);
         else
           digitalWrite(RLED, HIGH);
@@ -682,6 +718,32 @@ void loop(void) {
         writeConfiguration();
       }
       else if (numberPulseCount == 8){
+
+        if (preRingInterval == 5000)
+          preRingInterval = 10000;
+        else if(preRingInterval == 10000)
+          preRingInterval = 20000;
+        else if(preRingInterval == 20000)
+          preRingInterval = 30000;
+        else if(preRingInterval == 30000)
+          preRingInterval = 60000;
+        
+        else
+          preRingInterval = 5000;
+
+        String msg = "  - Pre-Ring period changed to: " + String(preRingInterval/1000) + " seconds";
+        Serial.println(msg);
+        log("Admin",msg);
+        if (preRingInterval == 30000) // i.e if equal default
+          digitalWrite(GLED, HIGH);
+        else
+          digitalWrite(RLED, HIGH);
+        delay(500);
+        writeConfiguration();
+
+      }
+      else if (numberPulseCount == 9){
+                
         autoRestart = !autoRestart;
         String msg = "  - Auto-restart changed to: " + String(autoRestart) + " (1: Enabled, 0: Disabled)";
         Serial.println(msg);
@@ -692,9 +754,7 @@ void loop(void) {
           digitalWrite(RLED, HIGH);
         delay(500);
         writeConfiguration();
-      }
-      else if (numberPulseCount == 9){
-        restart();
+        
       }
       else if (numberPulseCount == 10){
         digitalWrite(GLED, LOW);
@@ -838,7 +898,7 @@ void loop(void) {
 
 void logSettings(){
 
-String msg = "stallPeriod: " + String(stallPeriod) + "; recInterval: " + String(recInterval) + "; recEnabled: " + String(recEnabled) + "; ringerEnabled: " + String(ringerEnabled) + "; interviewsSelected: " + String(interviewsSelected) + "; cityIndex: " + String(cityIndex) + "; prePlayPrompt: " + String(prePlayPrompt) + "; autoRestart: " + String(autoRestart);
+String msg = "preRingInterval: " + String(preRingInterval/1000) + "; stallPeriod: " + String(stallPeriod/1000) + "; recInterval: " + String(recInterval/1000) + "; recEnabled: " + String(recEnabled) + "; ringerEnabled: " + String(ringerEnabled) + "; interviewsSelected: " + String(interviewsSelected) + "; cityIndex: " + String(cityIndex) + "; prePlayPrompt: " + String(prePlayPrompt) + "; autoRestart: " + String(autoRestart);
 
 log("Settings", msg);
 
@@ -1144,6 +1204,8 @@ void writeConfiguration(){
     EEPROM.update(10,cityIndex);
     EEPROM.update(11,prePlayPrompt);
     EEPROM.update(12,autoRestart);
+    EEPROM.update(13, preRingInterval >> 8);
+    EEPROM.update(14, preRingInterval & 0xFF);
     
     EEPROM.update(ADDR_EEPROM_MARKER, MARKER_EEPROM);
     
@@ -1165,7 +1227,8 @@ void initializeEEPROM()
     cityIndex = EEPROM.read(10);
     prePlayPrompt = EEPROM.read(11);
     autoRestart = EEPROM.read(12);
-    // if you want more vars later on, start at address 13
+    preRingInterval = (EEPROM.read(13) << 8) + EEPROM.read(13 + 1);
+    // if you want more vars later on, start at address 15
     
     Serial.print(" recEnabled: ");
     Serial.print(recEnabled);
@@ -1182,7 +1245,9 @@ void initializeEEPROM()
     Serial.print(", prePlayPrompt: ");
     Serial.print(prePlayPrompt);
     Serial.print(", autoRestart: ");
-    Serial.println(autoRestart);
+    Serial.print(autoRestart);
+    Serial.print(", preRingInterval: ");
+    Serial.println(preRingInterval);
     
   }
   else {
@@ -1190,7 +1255,7 @@ void initializeEEPROM()
     Serial.print("- EEPROM not initialized. Setting config from code instead >");
     EEPROM.update(1,recEnabled);
     EEPROM.update(2,ringerEnabled);
-    //stall period (int)
+    //stall period (uint)
     EEPROM.update(3, stallPeriod >> 8);
     EEPROM.update(4, stallPeriod & 0xFF);
     writeLongIntoEEPROM(5, recInterval);
@@ -1198,7 +1263,10 @@ void initializeEEPROM()
     EEPROM.update(10,cityIndex);
     EEPROM.update(11,prePlayPrompt);
     EEPROM.update(12,autoRestart);
-    // if you want more vars later on, start at address 13
+    //preRingInterval (uint)
+    EEPROM.update(13, preRingInterval >> 8);
+    EEPROM.update(14, preRingInterval & 0xFF);
+    // if you want more vars later on, start at address 15
     
     Serial.print(" recEnabled: ");
     Serial.print(recEnabled);
@@ -1215,7 +1283,9 @@ void initializeEEPROM()
     Serial.print(", prePlayPrompt: ");
     Serial.print(prePlayPrompt);
     Serial.print(", autoRestart: ");
-    Serial.println(autoRestart);
+    Serial.print(autoRestart);
+    Serial.print(", preRingInterval: ");
+    Serial.println(preRingInterval);
     
     // save marker
     EEPROM.update(ADDR_EEPROM_MARKER, MARKER_EEPROM);

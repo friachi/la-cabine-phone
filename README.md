@@ -1,4 +1,4 @@
-﻿# LA CABINE **134** 
+# LA CABINE **134** 
 
 ***Support* *contact***: Fahed Al Riachi, <riachi@gmail.com>
 
@@ -29,7 +29,7 @@ To put the phone in “*Normal Operation*” mode ready to receive users:
 |**Step**|**Led indicator**|
 | :- | :-: |
 |Phone in Idle mode awaiting users|green|
-|Movement detected (1.5 meters around, 80 cm below), the phone will ring (7 rings, if not picked up, it will go back to Idle)|gred/red flash|
+|Movement detected (1.5 meters around, 80 cm below), the phone wait 30 seconds before it will ring (7 rings, if not picked up, it will go back to Idle)|gred/red flash|
 |Phone is picked up|none|
 |A welcome message is played|green/red|
 |A randomly selected *interview* will be played. |red|
@@ -72,8 +72,8 @@ Below is the list of commands to Dial once in COMMAND mode:
 |Change STALL interval (the wait time after hook is down, and before the phone can be used by next user)|**5**|15 seconds|15 →  20 →  5 → 10 seconds|
 |Change RECORDING duration (the max allowed time per user recording)|**6**|2 minutes|3 → 1 → half minutes|
 |Change City / language|**7**|Port-Vendres|Saida → Miami|
-|Enable daily system restart (@ 3 AM)|**8**|Enabled|Disabled|
-|System Restart |**9**|-|…FLASH…|
+|Change preRing interval (time between motion detection and ring to start) |**8**|30 second|60→5→10→20 seconds|
+|Enable daily system restart (@ 3 AM)|**9**|Enabled|Disabled|
 
 Any time a setting is modified the led will flash (GREEN for default value, otherwise RED), and the new value is **saved** and persisted even after turning the phone on/off. You can leave COMMAND mode by dialing **0** and return to Admin menu 
 
