@@ -472,6 +472,16 @@ void loop(void) {
         }
              
       }
+
+      if(numberSwitch.rose()){
+        playWav1.stop();
+        state = Playing;
+        currentInterview = pickWavFile();
+        log("Playing", currentInterview);
+        delay(500);
+        playInterview(currentInterview);
+        
+      }
       
       break; // from Playing
     }
