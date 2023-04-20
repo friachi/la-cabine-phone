@@ -32,7 +32,7 @@ To put the phone in “*Normal Operation*” mode ready to receive users:
 |Movement detected (1.5 meters around, 80 cm below), the phone wait 30 seconds before it will ring (7 rings, if not picked up, it will go back to Idle)|gred/red flash|
 |Phone is picked up|none|
 |A welcome message is played|green/red|
-|A randomly selected *interview* will be played. |red|
+|A randomly selected *interview* will be played (in this stage: to select another interview randomly, dial any number on the rotary dial) |red|
 |A message will be played informing the user that he/she can record a message of their own|green/red|
 |<p>The user can now record / leave a message (2 mins max)</p><p>***Note***: during the last 10 seconds of the recording, the green led will flash each second.</p>|red|
 |When done recording, he/she will hear a final goodbye message|green/red|
