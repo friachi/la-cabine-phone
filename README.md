@@ -69,10 +69,10 @@ Below is the list of commands to Dial once in COMMAND mode:
 |<p>Enable Ringer / movement detection</p><p>(when disabled, the user can pick up the hook any time)</p>|**2**|Enabled|Disabled|
 |Enable Pre-Play message (played before interview)|**3**|Enabled|Disabled|
 |Interviews/Recordings playlist (used for testing)|**4**|Interviews|Recordings|
-|Change STALL interval (the wait time after hook is down, and before the phone can be used by next user)|**5**|15 seconds|15 →  20 →  5 → 10 seconds|
+|Change STALL interval (the wait time after hook is down, and before the phone can be used by next user)|**5**|60 seconds|5 → 10 → 15 → 20 → 30 → 60 seconds|
 |Change RECORDING duration (the max allowed time per user recording)|**6**|2 minutes|3 → 1 → half minutes|
 |Change City / language|**7**|Port-Vendres|Saida → Miami|
-|Change preRing interval (time between motion detection and ring to start) |**8**|30 second|60→5→10→20 seconds|
+|Change preRing interval (time between motion detection and ring to start) |**8**|30 second|5 → 10 → 20 → 30 → 60 seconds|
 |Enable daily system restart (@ 3 AM)|**9**|Enabled|Disabled|
 
 Any time a setting is modified the led will flash (GREEN for default value, otherwise RED), and the new value is **saved** and persisted even after turning the phone on/off. You can leave COMMAND mode by dialing **0** and return to Admin menu 

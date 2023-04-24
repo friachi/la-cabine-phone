@@ -79,6 +79,7 @@ time_t timeNow;
 int autoRestartHour = 3;
 int motion; 
 float dura = 0;
+bool motionFlag = false;
 
 //Recording vars
 String recordingslist[RECODINGSMAXSIZE];
@@ -320,6 +321,7 @@ void loop(void) {
       digitalWrite(GLED, HIGH);
       digitalWrite(RLED, LOW);
       ringsBeforeAbandon = MAX_RINGS;
+      motionFlag = false;
       
       if(hookSwitch.fell()){
         Serial.println("Hook up");
@@ -553,6 +555,20 @@ void loop(void) {
       playWav1.stop();
       digitalWrite(GLED, HIGH);
       digitalWrite(RLED, HIGH);
+
+      if(motion == LOW && motionFlag == true) {
+        Serial.println("INFO: Motion stopped.");
+        motionFlag = false;
+      }   
+      
+
+      if(motion == HIGH && motionFlag == false) {
+        Serial.println("INFO: Motion detected...");
+        digitalWrite(GLED, LOW);
+        delay(500);
+        digitalWrite(GLED, HIGH);
+        motionFlag = true;
+      }     
 
       if(hookSwitch.fell()){
         Serial.print("> Audition files for ");        
