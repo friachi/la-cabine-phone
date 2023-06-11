@@ -382,15 +382,15 @@ void loop(void) {
       int now = millis();
       if (now - lastRingTime > 3000 && ringsBeforeAbandon > 0){
         Serial.println("Ringing");
+        digitalWrite(RNGL, LOW);
         for (int j=0;j<2;j++){
           for(int i=0;i<20;i++){
             hookSwitch.update();
             if(hookSwitch.fell()){
               j = 2;
               break;
-            }
-            digitalWrite(RNGL, i%2);
-            digitalWrite(RNGR, 1-(i%2));
+            }           
+            digitalWrite(RNGR, HIGH);
             digitalWrite(RLED, i%2);
             digitalWrite(GLED, 1-(i%2));
             delay(20);
