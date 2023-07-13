@@ -260,20 +260,13 @@ void setup() {
   Serial.println(F("====================== RUN ======================"));
 
     
-  if (digitalRead(SWM) == HIGH){
-    Serial.println("Admin idle");
-    state = AdminIdle;
-  }
-  else
-  {
-     if(digitalRead(SWH)== LOW){
+ if(digitalRead(SWH)== LOW){
         state = Wait;
       }
       else {
         state = Idle;
         Serial.println("Idle");
       }
-  }
 
   
 }
@@ -881,6 +874,13 @@ void loop(void) {
         Serial.println("Exit Admin and wait hook down");
         playing = false;
         state = Wait;  
+      }
+
+      if (internalSwitch.fell()){
+          Serial.println("Admin Idle mode");
+          if (state == Recording)
+            stopRecording();
+          state = AdminIdle;  
       }
 
    
