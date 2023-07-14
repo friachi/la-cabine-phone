@@ -640,12 +640,32 @@ void loop(void) {
         String msg = "  - Ringer mode changed to: " + String(ringerEnabled) + " (1: Enabled, 0: Disabled)";
         Serial.println(msg);
         log("Admin",msg);
-        if (ringerEnabled)
+        if (ringerEnabled) {
           digitalWrite(GLED, HIGH);
+          // test ringer
+          Serial.println("Ringing once");
+          digitalWrite(RNGL, LOW);
+          for (int j=0;j<2;j++){
+            for(int i=0;i<20;i++){         
+              digitalWrite(RNGR, HIGH);
+              //digitalWrite(RLED, i%2);
+              //digitalWrite(GLED, 1-(i%2));
+              delay(20);
+            }
+          delay(200);
+          }
+          // stop ringing
+          digitalWrite(RNGL, LOW);
+          digitalWrite(RNGR, LOW);
+          //digitalWrite(RLED, LOW);
+          //digitalWrite(GLED, LOW);
+        
+        }
         else
           digitalWrite(RLED, HIGH);
         delay(500);
         writeConfiguration();
+
       }
       else if (numberPulseCount == 3){
         prePlayPrompt = !prePlayPrompt;
