@@ -643,7 +643,7 @@ void loop(void) {
         if (ringerEnabled) {
           digitalWrite(GLED, HIGH);
           // test ringer
-          Serial.println("Ringing once");
+          Serial.println("    Ringing once for testing");
           digitalWrite(RNGL, LOW);
           for (int j=0;j<2;j++){
             for(int i=0;i<20;i++){         
@@ -773,7 +773,7 @@ void loop(void) {
         String msg = "  - Pre-Ring period changed to: " + String(preRingInterval/1000) + " seconds";
         Serial.println(msg);
         log("Admin",msg);
-        if (preRingInterval == 30000) // i.e if equal default
+        if (preRingInterval == 10000) // i.e if equal default
           digitalWrite(GLED, HIGH);
         else
           digitalWrite(RLED, HIGH);
@@ -895,14 +895,6 @@ void loop(void) {
         playing = false;
         state = Wait;  
       }
-
-      if (internalSwitch.fell()){
-          Serial.println("Admin Idle mode");
-          if (state == Recording)
-            stopRecording();
-          state = AdminIdle;  
-      }
-
    
       break; // from PlayNext
    }
@@ -910,7 +902,7 @@ void loop(void) {
   
   } // end switch
     
-  if(hookSwitch.rose() && digitalRead(SWM) == LOW && state != Idle){
+  if(hookSwitch.rose() && digitalRead(SWI) == HIGH && state != Idle && state != AdminIdle){
     Serial.println("Hook down");
     if (state == Recording)
       stopRecording();
@@ -930,6 +922,12 @@ void loop(void) {
   
   }
 
+   if (internalSwitch.fell() && state != AdminIdle && state != PlayNext && state != Command){
+          Serial.println("Admin Idle mode");
+          if (state == Recording)
+            stopRecording();
+          state = AdminIdle;  
+  }
   //if (modeSwitch.rose()){
   //  Serial.println("Admin Idle mode");
   //  if (state == Recording)
