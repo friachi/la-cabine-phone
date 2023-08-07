@@ -50,13 +50,13 @@ Allows changing some of the phone settings, in addition to listen/audition Inter
 
 **To switch to *Admin* mode**: 
 
-1) Disconnect phone from power
-1) Flip the **MODE** switch to the **UP** position 
-1) Plug back to power. 
+1) With the phone powered on, losen the screw on top to expose the internals of the phone
+2) single-press the small black push button (found on top-right of the pcb just above the sd card)
+3) The phone will now start in Admin mode (both GREEN and RED leds will be ON
 
-The phone will now start in Admin mode (both GREEN and RED leds will be ON        )
+   You can now close the phone by screwing back the top screw.  
 
-You can leave Admin mode any time (back to “Normal operation”) by simply flipping MODE switch back to DOWN position
+With the phone closed, you can leave Admin mode any time (thus back to “Normal operation”) by simply flipping MODE switch back toDOWN position (if it was already the at DOWN position, then flip it UP then DOWN)
 
 ## Changing default settings
 In Admin mode, **Dial 0.** Both leds should turn OFF . You are now in COMMAND MODE, where some aspects of the “Normal operation” experience can be tweaked and customized.
