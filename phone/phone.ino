@@ -5,6 +5,8 @@
  * In addition, it allows customizing and tweeking various phone settings
  */
 
+ // VERSION 2.0
+
  //updates: Adapted in portvendre to:
  // add preRingInterval, default at 30 secs, with saving mechanism using command 8
  // extend stallPeriod to have 1 min included
@@ -42,7 +44,7 @@
 #define RECODINGSMAXSIZE  1000
 #define ADDR_EEPROM_MARKER 0  // EEPROM marker address
 #define MARKER_EEPROM 123     // EEPROM marker value
-#define MAX_RINGS 7     // EEPROM marker value
+#define MAX_RINGS 7     
 
 #define RESTART_ADDR       0xE000ED0C
 #define READ_RESTART()     (*(volatile uint32_t *)RESTART_ADDR)
@@ -375,20 +377,22 @@ void loop(void) {
       int now = millis();
       if (now - lastRingTime > 3000 && ringsBeforeAbandon > 0){
         Serial.println("Ringing");
-        digitalWrite(RNGL, LOW);
         for (int j=0;j<2;j++){
           for(int i=0;i<20;i++){
             hookSwitch.update();
             if(hookSwitch.fell()){
               j = 2;
               break;
-            }           
-            digitalWrite(RNGR, HIGH);
+            }
+            digitalWrite(RNGL, i%2);
+            digitalWrite(RNGR, 1-(i%2));
             digitalWrite(RLED, i%2);
             digitalWrite(GLED, 1-(i%2));
-            delay(20);
+            delay(12);
           }
-        delay(200);
+        digitalWrite(RNGL, LOW);
+        digitalWrite(RNGR, LOW);
+        delay(300);
         }
         // stop ringing
         digitalWrite(RNGL, LOW);
@@ -644,22 +648,19 @@ void loop(void) {
           digitalWrite(GLED, HIGH);
           // test ringer
           Serial.println("    Ringing once for testing");
-          digitalWrite(RNGL, LOW);
           for (int j=0;j<2;j++){
             for(int i=0;i<20;i++){         
-              digitalWrite(RNGR, HIGH);
-              //digitalWrite(RLED, i%2);
-              //digitalWrite(GLED, 1-(i%2));
-              delay(20);
+              digitalWrite(RNGL, i%2);
+              digitalWrite(RNGR, 1-(i%2));
+              delay(12);
             }
+          digitalWrite(RNGL, LOW);
+          digitalWrite(RNGR, LOW);
           delay(200);
           }
           // stop ringing
           digitalWrite(RNGL, LOW);
-          digitalWrite(RNGR, LOW);
-          //digitalWrite(RLED, LOW);
-          //digitalWrite(GLED, LOW);
-        
+          digitalWrite(RNGR, LOW);        
         }
         else
           digitalWrite(RLED, HIGH);
